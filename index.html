@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="Math Sidecar mobile PWA — shared math answers rendered as collapsible MathJax cards.">
+  <title>Math Sidecar</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="app.css">
+  <script src="mathjax-config.js"></script>
+  <script src="vendor/mathjax/tex-svg-full.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header id="topbar">
+    <div class="title-wrap">
+      <strong>Math Sidecar</strong>
+      <span id="version">v0.1.0</span>
+      <span id="renderer">MJ …</span>
+      <span id="count">0</span>
+    </div>
+    <div class="actions">
+      <button id="start" type="button" title="Math Sidecar 시작 프롬프트 복사">시작</button>
+      <button id="paste" type="button" title="클립보드에서 답변 가져오기">붙여넣기</button>
+      <button id="import" type="button">가져오기</button>
+      <button id="latest" type="button">최신</button>
+      <button id="collapse-all" type="button" title="모든 답변 접기">모두 접기</button>
+      <button id="install" type="button" hidden>설치</button>
+    </div>
+  </header>
+
+  <main id="list" aria-live="polite">
+    <div id="empty">
+      <strong>아직 수학 답변이 없습니다.</strong><br>
+      Android Chrome에서 ChatGPT/Claude의 Math Sidecar 블록을 선택한 뒤<br>
+      <b>공유 → Math Sidecar</b>로 보내세요.
+    </div>
+  </main>
+
+  <div id="ask-popup" hidden><button id="ask" type="button">질문 복사</button></div>
+  <div id="toast" hidden></div>
+
+  <dialog id="import-dialog">
+    <form method="dialog" id="import-form">
+      <div class="dialog-head">
+        <strong>Math Sidecar로 가져오기</strong>
+        <button value="cancel" class="icon-btn" aria-label="닫기">×</button>
+      </div>
+      <label>텍스트
+        <textarea id="import-text" rows="12" placeholder="MATHPANEL_V1 ... END_MATHPANEL 블록을 붙여넣으세요."></textarea>
+      </label>
+      <label>원본 주소 (선택)
+        <input id="import-url" type="url" inputmode="url" placeholder="https://chatgpt.com/... 또는 https://claude.ai/...">
+      </label>
+      <div class="dialog-actions">
+        <button value="cancel">취소</button>
+        <button id="do-import" value="default">가져오기</button>
+      </div>
+    </form>
+  </dialog>
+
+  <noscript>Math Sidecar는 JavaScript가 필요합니다.</noscript>
+</body>
+</html>

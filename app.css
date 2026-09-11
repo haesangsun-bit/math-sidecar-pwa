@@ -1,0 +1,64 @@
+:root {
+  color-scheme: light dark;
+  --border: rgba(127,127,127,.28);
+  --muted: color-mix(in srgb, CanvasText 58%, transparent);
+  --card: color-mix(in srgb, Canvas 91%, CanvasText 9%);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; }
+html, body { margin:0; width:100%; height:100%; background:Canvas; color:CanvasText; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+body { display:flex; flex-direction:column; overflow:hidden; padding-top:var(--safe-top); }
+#topbar { flex:0 0 auto; min-height:54px; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 10px; border-bottom:1px solid var(--border); background:Canvas; overflow-x:auto; scrollbar-width:none; }
+#topbar::-webkit-scrollbar { display:none; }
+.title-wrap,.actions,.card-actions,.card-heading { display:flex; align-items:center; gap:.42rem; min-width:0; }
+.title-wrap strong { white-space:nowrap; }
+#version,#renderer,#count,.answer-label,.source-badge { display:inline-flex; align-items:center; justify-content:center; min-height:1.25rem; padding:.08rem .4rem; border:1px solid var(--border); border-radius:999px; color:var(--muted); font-size:.68rem; font-weight:650; line-height:1; white-space:nowrap; }
+#count { min-width:1.45rem; background:CanvasText; color:Canvas; border-color:CanvasText; }
+button { appearance:none; border:1px solid var(--border); border-radius:9px; background:transparent; color:inherit; font:inherit; cursor:pointer; touch-action:manipulation; }
+button:active { background:color-mix(in srgb, CanvasText 12%, transparent); }
+.actions button { padding:.38rem .54rem; font-size:.77rem; white-space:nowrap; }
+#list { flex:1 1 auto; min-height:0; overflow:auto; overscroll-behavior:contain; padding:10px 10px calc(12px + var(--safe-bottom)); scroll-padding-top:10px; }
+#empty { margin:22vh auto 0; max-width:30rem; padding:0 18px; text-align:center; color:var(--muted); line-height:1.65; font-size:.92rem; }
+.card { margin:0 0 11px; border:1px solid var(--border); border-radius:14px; background:var(--card); overflow:visible; }
+.card-header { position:sticky; top:0; z-index:5; display:flex; align-items:flex-start; justify-content:space-between; gap:.65rem; padding:10px; border-bottom:1px solid var(--border); border-radius:13px 13px 0 0; background:var(--card); box-shadow:0 1px 0 var(--border); cursor:pointer; user-select:none; }
+.card.collapsed .card-header { border-radius:13px; border-bottom-color:transparent; box-shadow:none; }
+.card-heading { flex:1 1 auto; align-items:flex-start; }
+.chevron { width:1rem; flex:0 0 1rem; color:var(--muted); font-size:.82rem; text-align:center; padding-top:.1rem; }
+.meta-stack { min-width:0; flex:1 1 auto; }
+.meta-line { display:flex; flex-wrap:wrap; align-items:center; gap:.32rem; margin-bottom:.2rem; }
+.card-title { min-width:0; font-size:.92rem; font-weight:720; line-height:1.35; overflow-wrap:anywhere; }
+.card-actions { cursor:default; flex:0 0 auto; }
+.card-actions button { padding:.3rem .45rem; font-size:.7rem; white-space:nowrap; }
+.card-body { padding:14px; white-space:pre-wrap; font-size:.95rem; line-height:1.65; overflow-wrap:anywhere; user-select:text; }
+.card-body[hidden] { display:none!important; }
+.display-math { display:block; max-width:100%; margin:.82rem 0; padding:.38rem 0; overflow-x:auto; overflow-y:hidden; white-space:normal; -webkit-overflow-scrolling:touch; }
+.inline-math { display:inline-block; max-width:100%; vertical-align:middle; white-space:normal; }
+.display-math mjx-container,.inline-math mjx-container { max-width:100%; }
+mjx-assistive-mml { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0 0 0 0)!important; clip-path:inset(50%)!important; white-space:nowrap!important; border:0!important; }
+.math-loading { color:var(--muted); font-size:.82em; }
+.math-error details { white-space:normal; }
+.math-error summary { cursor:pointer; color:var(--muted); font-size:.88rem; }
+.math-error pre { max-height:14rem; overflow:auto; white-space:pre-wrap; }
+.selection-highlight,.drag-highlight { background:color-mix(in srgb, Highlight 28%, transparent)!important; outline:1px solid color-mix(in srgb, Highlight 55%, transparent); border-radius:5px; }
+#ask-popup { position:fixed; z-index:9999; padding:4px; border:1px solid var(--border); border-radius:11px; background:Canvas; box-shadow:0 8px 24px rgba(0,0,0,.22); }
+#ask-popup[hidden],#toast[hidden] { display:none!important; }
+#ask { padding:.5rem .7rem; background:CanvasText; color:Canvas; font-size:.78rem; font-weight:700; }
+#toast { position:fixed; left:50%; bottom:calc(20px + var(--safe-bottom)); transform:translateX(-50%); z-index:10000; max-width:min(88vw,440px); padding:.6rem .8rem; border-radius:10px; background:CanvasText; color:Canvas; box-shadow:0 8px 24px rgba(0,0,0,.24); font-size:.8rem; text-align:center; }
+dialog { width:min(94vw,620px); max-height:88vh; padding:0; border:1px solid var(--border); border-radius:15px; background:Canvas; color:CanvasText; box-shadow:0 18px 60px rgba(0,0,0,.35); }
+dialog::backdrop { background:rgba(0,0,0,.4); }
+#import-form { display:flex; flex-direction:column; gap:12px; padding:14px; }
+.dialog-head,.dialog-actions { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.dialog-actions { justify-content:flex-end; }
+.icon-btn { border:0; font-size:1.4rem; line-height:1; }
+label { display:flex; flex-direction:column; gap:6px; font-size:.82rem; color:var(--muted); }
+textarea,input { width:100%; border:1px solid var(--border); border-radius:10px; background:Canvas; color:CanvasText; font:inherit; padding:10px; }
+textarea { resize:vertical; min-height:180px; }
+.dialog-actions button { padding:.48rem .75rem; }
+@media(max-width:720px){
+  #renderer{display:none}
+  #topbar{align-items:flex-start; flex-direction:column; gap:7px}
+  .title-wrap,.actions{width:max-content; min-width:100%}
+  .card-actions .source-link{display:none}
+  .card-body{padding:13px 12px}
+}
