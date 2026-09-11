@@ -1,4 +1,4 @@
-# Math Sidecar PWA v0.1.0
+# Math Sidecar PWA v0.1.1
 
 Android Chrome에서 사용할 수 있도록 만든 Math Sidecar의 PWA 버전입니다. OpenAI/Anthropic API를 사용하지 않습니다.
 
@@ -47,3 +47,11 @@ PC 확장(v0.4.1)은 ChatGPT/Claude 페이지의 DOM을 직접 읽을 수 있으
 - 선택 질문: `질문 복사` → 채팅 탭에 붙여넣기
 
 Sidecar 내부의 렌더링, 카드, 접기, sticky 헤더, MathJax 언로드/재렌더링 방식은 PC 버전과 최대한 같게 유지했습니다.
+
+## v0.1.1 설치 안정성 수정
+
+- 아이콘 192/512를 저장소 루트에도 배치했습니다.
+- 일반 아이콘과 maskable 아이콘을 manifest에서 분리했습니다.
+- Service Worker 설치가 선택적 파일 하나의 누락 때문에 전체 실패하지 않도록 수정했습니다.
+- MathJax 대형 번들은 첫 설치를 막지 않고 필요할 때 캐시합니다.
+- 상단에 `SW ✓`, `PWA 설치가능`, `PWA ✓` 상태가 표시됩니다.

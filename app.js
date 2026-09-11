@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.1.0";
+  const VERSION = "0.1.1";
   const START = "MATHPANEL_V1";
   const END = "END_MATHPANEL";
   const DB_NAME = "mathsidecar-pwa";
@@ -649,6 +649,13 @@
     event.preventDefault();
     deferredInstallPrompt = event;
     document.getElementById("install").hidden = false;
+    const st = document.getElementById("pwa-status");
+    if (st) st.textContent = "PWA 설치가능";
+  });
+  window.addEventListener("appinstalled", () => {
+    const st = document.getElementById("pwa-status");
+    if (st) st.textContent = "PWA ✓";
+    document.getElementById("install").hidden = true;
   });
   document.getElementById("install").addEventListener("click", async () => {
     if (!deferredInstallPrompt) { showToast("브라우저 메뉴에서 ‘홈 화면에 추가/앱 설치’를 선택하세요."); return; }
@@ -677,7 +684,16 @@
   async function init() {
     probeMathJax();
     if ("serviceWorker" in navigator) {
-      try { await navigator.serviceWorker.register("./sw.js", { scope:"./" }); } catch (error) { console.warn("Service worker registration failed", error); }
+      try {
+        await navigator.serviceWorker.register("./sw.js", { scope:"./" });
+        await navigator.serviceWorker.ready;
+        const st = document.getElementById("pwa-status");
+        if (st && !deferredInstallPrompt) st.textContent = matchMedia("(display-mode: standalone)").matches ? "PWA ✓" : "SW ✓";
+      } catch (error) {
+        console.warn("Service worker registration failed", error);
+        const st = document.getElementById("pwa-status");
+        if (st) st.textContent = "SW ✕";
+      }
     }
     try { await navigator.storage?.persist?.(); } catch {}
     await loadCards();

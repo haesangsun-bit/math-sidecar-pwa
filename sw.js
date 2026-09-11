@@ -1,29 +1,42 @@
 "use strict";
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 const CACHE = `mathsidecar-pwa-${VERSION}`;
 const SHARE_CACHE = "mathsidecar-pwa-shares-v1";
-const APP_SHELL = [
+const CORE = [
   "./",
   "./index.html",
   "./app.css",
   "./app.js",
   "./manifest.json",
   "./mathjax-config.js",
-  "./vendor/mathjax/tex-svg-full.js",
-  "./vendor/mathjax/LICENSE",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icon-192.png",
+  "./icon-512.png",
+  "./icon-maskable-192.png",
+  "./icon-maskable-512.png"
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    // Do not make SW installation all-or-nothing. One optional asset must not
+    // prevent Chrome from recognising the site as an installable PWA.
+    await Promise.allSettled(CORE.map(async (url) => {
+      try {
+        const response = await fetch(url, { cache: "reload" });
+        if (response.ok) await cache.put(url, response.clone());
+      } catch (_) {}
+    }));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter((key) => key.startsWith("mathsidecar-pwa-") && key !== CACHE && key !== SHARE_CACHE).map((key) => caches.delete(key)));
+    await Promise.all(keys
+      .filter((key) => key.startsWith("mathsidecar-pwa-") && key !== CACHE && key !== SHARE_CACHE)
+      .map((key) => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -44,11 +57,14 @@ self.addEventListener("fetch", (event) => {
         url: String(form.get("url") || ""),
         receivedAt: Date.now()
       };
-      const id = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const id = (self.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const shareCache = await caches.open(SHARE_CACHE);
-      await shareCache.put(shareKey(id), new Response(JSON.stringify(payload), { headers: { "content-type": "application/json; charset=utf-8" } }));
-      const destination = new URL(`./index.html?share=${encodeURIComponent(id)}`, self.registration.scope).href;
-      return Response.redirect(destination, 303);
+      await shareCache.put(shareKey(id), new Response(JSON.stringify(payload), {
+        headers: { "content-type": "application/json; charset=utf-8" }
+      }));
+      return Response.redirect(new URL(`./index.html?share=${encodeURIComponent(id)}`, self.registration.scope).href, 303);
     })());
     return;
   }
@@ -61,23 +77,36 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (event.request.method === "GET" && url.origin === self.location.origin) {
-    event.respondWith((async () => {
-      const cached = await caches.match(event.request);
-      if (cached) return cached;
+  if (event.request.method !== "GET" || url.origin !== self.location.origin) return;
+
+  event.respondWith((async () => {
+    // Navigation: network first, with cached app shell fallback.
+    if (event.request.mode === "navigate") {
       try {
         const fresh = await fetch(event.request);
-        if (fresh.ok && event.request.destination !== "document") {
+        if (fresh.ok) {
           const cache = await caches.open(CACHE);
-          cache.put(event.request, fresh.clone());
+          cache.put("./index.html", fresh.clone()).catch(() => {});
         }
         return fresh;
-      } catch {
-        if (event.request.mode === "navigate") return (await caches.match("./index.html")) || Response.error();
-        return Response.error();
+      } catch (_) {
+        return (await caches.match("./index.html")) || (await caches.match("./")) || Response.error();
       }
-    })());
-  }
+    }
+
+    const cached = await caches.match(event.request);
+    if (cached) return cached;
+    try {
+      const fresh = await fetch(event.request);
+      if (fresh.ok) {
+        const cache = await caches.open(CACHE);
+        cache.put(event.request, fresh.clone()).catch(() => {});
+      }
+      return fresh;
+    } catch (_) {
+      return Response.error();
+    }
+  })());
 });
 
 self.addEventListener("message", (event) => {
